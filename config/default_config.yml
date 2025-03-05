@@ -1,0 +1,44 @@
+# Default configuration for Web Scraper with crawl4ai
+
+# Output settings
+output:
+  directory: "./scraped_content"  # Default output directory 
+  overwrite: false                # Whether to overwrite existing files
+
+# Crawler settings
+crawler:
+  timeout: 30                     # Request timeout in seconds
+  max_retries: 3                  # Maximum number of retries
+  user_agent: "Web Scraper with crawl4ai/0.1.0"
+  respect_robots_txt: true        # Whether to respect robots.txt
+  delay: 1                        # Delay between requests in seconds
+
+# Crawl depth settings
+depth:
+  default: 1                      # Default crawl depth (1 = single page only)
+  max: 10                         # Maximum allowed crawl depth
+  stay_within_domain: true        # Whether to stay within the initial domain
+
+# Authentication settings
+authentication:
+  store_credentials: true         # Whether to store credentials
+  use_keyring: true               # Whether to use system keyring
+
+# Markdown settings
+markdown:
+  include_metadata: true          # Include metadata in the output file
+  preserve_tables: true           # Preserve table formatting
+  download_images: false          # Whether to download images locally
+  fix_heading_levels: true        # Ensure proper heading hierarchy
+  
+# Confluence settings
+confluence:
+  follow_children: true           # Whether to follow child pages
+  include_attachments: true       # Whether to include attachments
+  max_space_depth: 5              # Maximum depth for space crawling
+
+# Logging settings
+logging:
+  level: "INFO"                   # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  file: "./logs/scraper.log"      # Log file path
+  console: true                   # Whether to log to console
