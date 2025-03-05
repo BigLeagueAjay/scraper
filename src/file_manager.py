@@ -26,7 +26,17 @@ class FileManager:
         Args:
             base_output_dir: Base directory for saving output files
         """
-        self.base_output_dir = base_output_dir or os.path.join(os.getcwd(), "scraped_content")
+        # Determine the project root directory
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        
+        # Set the base output directory using absolute paths
+        if base_output_dir:
+            # If a custom base directory is provided, ensure it's absolute
+            self.base_output_dir = os.path.abspath(base_output_dir)
+        else:
+            # Default to the 'scraped_content' directory in the project root
+            self.base_output_dir = os.path.join(project_root, "scraped_content")
+        
         logger.debug(f"Initializing FileManager with base directory: {self.base_output_dir}")
     
     def save(self, content: str, domain: str, title: str, space_key: Optional[str] = None) -> str:

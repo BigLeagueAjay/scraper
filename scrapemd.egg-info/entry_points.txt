@@ -1,0 +1,2 @@
+[console_scripts]
+scrapemd = src.cli:main_cli

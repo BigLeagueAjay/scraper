@@ -4,9 +4,11 @@ Content Processor module for the Web Scraper
 This module handles the processing of crawled content and conversion to markdown.
 """
 
-import logging
+import os
 import re
+import logging
 from typing import Dict, Any, Optional
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -33,20 +35,133 @@ class ContentProcessor:
         """
         logger.info("Processing crawled content")
         
-        # Check if result contains markdown already (crawl4ai feature)
+        # Initialize the content variable
+        markdown_content = None
+        
+        # Check content sources in priority order
         if 'markdown' in result and result['markdown']:
             logger.info("Using markdown provided by crawl4ai")
-            markdown = result['markdown']
-        else:
-            logger.warning("No markdown found in result, this should not happen with crawl4ai")
-            # We'd need to implement HTML to markdown conversion here
-            # But crawl4ai should already provide this
-            markdown = "Error: No content could be extracted."
+            markdown_content = result['markdown']
+        elif result.get('extraction_method') == 'enhanced' and result.get('content'):
+            logger.info("Using enhanced extraction content")
+            markdown_content = self._convert_to_markdown(result['content'])
+        elif result.get('content') and result.get('content') != "Error: No content could be extracted.":
+            logger.info("Using standard content")
+            markdown_content = self._convert_to_markdown(result['content'])
+        elif result.get('text'):
+            logger.info("Using plain text content")
+            markdown_content = result.get('text')
+        elif result.get('html'):
+            logger.info("Attempting HTML to markdown conversion")
+            markdown_content = self._html_to_markdown(result.get('html'))
+        
+        # If still no content, log error
+        if not markdown_content:
+            logger.warning("No usable content found in any field")
+            markdown_content = "No content could be extracted."
+        
+        # Extract a title if not already present in the result
+        if not result.get('title') and result.get('html'):
+            result['title'] = self.extract_title_from_html(result.get('html'))
         
         # Post-process the markdown to improve formatting
-        markdown = self._post_process_markdown(markdown, result)
+        processed_content = self._post_process_markdown(markdown_content, result)
         
-        return markdown
+        return processed_content
+    
+    def extract_title_from_html(self, html_content: str) -> str:
+        """
+        Extract the title from HTML content using multiple methods.
+        
+        Args:
+            html_content: HTML content string
+            
+        Returns:
+            str: Extracted title or empty string if not found
+        """
+        try:
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(html_content, 'html.parser')
+            
+            # Method 1: Check <title> tag
+            if soup.title and soup.title.string:
+                return soup.title.string.strip()
+            
+            # Method 2: Check Open Graph meta tags
+            og_title = soup.find('meta', property='og:title')
+            if og_title and og_title.get('content'):
+                return og_title['content'].strip()
+            
+            # Method 3: Check main heading
+            h1 = soup.find('h1')
+            if h1 and h1.text:
+                return h1.text.strip()
+            
+            # Method 4: Check for other prominent headings
+            for heading in soup.find_all(['h2', 'h3'], limit=1):
+                if heading.text:
+                    return heading.text.strip()
+                    
+        except Exception as e:
+            logger.error(f"Error extracting title from HTML: {str(e)}")
+        
+        return ""
+    
+    def _convert_to_markdown(self, content: str) -> str:
+        """
+        Convert content to markdown if it contains HTML.
+        
+        Args:
+            content: Content string that might contain HTML
+            
+        Returns:
+            str: Markdown-formatted content
+        """
+        # Check if content looks like HTML
+        if "<" in content and ">" in content and ("<p>" in content or "<div>" in content or "<a" in content):
+            return self._html_to_markdown(content)
+        return content
+
+    def _html_to_markdown(self, html_content: str) -> str:
+        """
+        Convert HTML content to markdown.
+        
+        Args:
+            html_content: HTML string
+            
+        Returns:
+            str: Markdown-formatted content
+        """
+        logger.debug("Converting HTML to markdown")
+        
+        try:
+            # Try using html2text if available
+            try:
+                import html2text
+                h = html2text.HTML2Text()
+                h.ignore_links = False
+                h.ignore_images = False
+                h.body_width = 0  # No wrapping
+                return h.handle(html_content)
+            except ImportError:
+                logger.warning("html2text not installed, trying BeautifulSoup")
+                
+            # Fall back to BeautifulSoup for basic conversion
+            try:
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(html_content, 'html.parser')
+                
+                # Simple HTML to markdown conversion
+                text = soup.get_text(separator='\n\n', strip=True)
+                
+                return text
+            except ImportError:
+                logger.warning("BeautifulSoup not installed, returning raw content")
+                return html_content
+                
+        except Exception as e:
+            logger.error(f"HTML to markdown conversion failed: {str(e)}")
+            return html_content  # Return original content if conversion fails
     
     def _post_process_markdown(self, markdown: str, result: Dict[str, Any]) -> str:
         """
@@ -61,8 +176,8 @@ class ContentProcessor:
         """
         logger.debug("Post-processing markdown content")
         
-        # Add title and metadata
-        title = result.get('title', 'Untitled Page')
+        # Extract title with fallback mechanisms
+        title = self._extract_title(result)
         url = result.get('url', '')
         timestamp = result.get('timestamp', '')
         
@@ -88,6 +203,48 @@ class ContentProcessor:
         processed_content = self._fix_links(processed_content)
         
         return processed_content
+    
+    def _extract_title(self, result: Dict[str, Any]) -> str:
+        """
+        Extract the title with improved fallback mechanisms.
+        
+        Args:
+            result: Dictionary containing the crawled content
+            
+        Returns:
+            str: Extracted title
+        """
+        # Try standard title field
+        if result.get('title'):
+            return result.get('title')
+        
+        # Try to extract from HTML if available
+        if result.get('html'):
+            title = self.extract_title_from_html(result.get('html'))
+            if title:
+                return title
+        
+        # Extract from URL if still no title
+        parsed_url = urlparse(result.get('url', ''))
+        path_parts = parsed_url.path.split('/')
+        path_parts = [p for p in path_parts if p]
+        
+        if path_parts:
+            # Convert last path segment to title
+            last_segment = path_parts[-1]
+            # Replace hyphens and underscores with spaces and capitalize
+            last_segment = last_segment.replace('-', ' ').replace('_', ' ')
+            if last_segment.strip():
+                return ' '.join(word.capitalize() for word in last_segment.split())
+        
+        # Check if it's a homepage
+        if not path_parts or (len(path_parts) == 1 and path_parts[0] in ('index.html', 'index.php')):
+            domain = parsed_url.netloc
+            return f"Home - {domain}"
+        
+        # Fall back to domain name
+        domain = parsed_url.netloc
+        return f"Documentation from {domain}"
     
     def _improve_tables(self, content: str) -> str:
         """

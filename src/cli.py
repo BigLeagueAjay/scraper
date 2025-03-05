@@ -6,7 +6,15 @@ This module handles the parsing of command line arguments.
 
 import argparse
 import os
+import sys
+import asyncio
+import logging
 from urllib.parse import urlparse
+
+from src.crawler import Crawler
+from src.processor import ContentProcessor
+from src.file_manager import FileManager
+from src.error_handler import setup_logging, handle_exception
 
 
 def parse_arguments():
@@ -124,3 +132,63 @@ def parse_arguments():
         parser.error("Both username and password must be provided for authentication")
     
     return args
+
+
+async def async_main():
+    """Main async function for the web scraper application."""
+    # Set up logging
+    setup_logging()
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Parse command line arguments
+        args = parse_arguments()
+        
+        logger.info(f"Starting scrape of {args.url}")
+        
+        # Initialize components
+        crawler = Crawler(args)
+        processor = ContentProcessor()
+        file_manager = FileManager(args.output if hasattr(args, 'output') else None)
+        
+        # Crawl the URL
+        result = await crawler.crawl(args.url)
+        
+        # Process the content
+        markdown_content = processor.process(result)
+        
+        # Generate filename from URL/title
+        domain = urlparse(args.url).netloc
+        title = result.get('title', 'unnamed_page')
+        
+        # Save the content
+        output_path = file_manager.save(markdown_content, domain, title)
+        
+        logger.info(f"Successfully saved markdown to {output_path}")
+        print(f"Content scraped and saved to: {output_path}")
+        
+        return 0
+        
+    except Exception as e:
+        handle_exception(e)
+        return 1
+
+
+def main_cli():
+    """
+    Entry point for the scrapemd command-line tool.
+    This function is called when the user runs the 'scrapemd' command.
+    """
+    try:
+        exit_code = asyncio.run(async_main())
+        sys.exit(exit_code)
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by user")
+        sys.exit(130)
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main_cli()
