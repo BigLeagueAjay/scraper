@@ -1,0 +1,11 @@
+2025-03-05 19:22:48,816 - root - INFO - Logging initialized at level INFO
+2025-03-05 19:22:48,816 - root - INFO - Log file: /Users/ajay/Dev/scraper/logs/scraper_20250305-192248.log
+2025-03-05 19:22:48,817 - root - INFO - Auto-detected Confluence URL: https://bigleagueinc.atlassian.net/l/cp/ru5nUbGr
+2025-03-05 19:22:48,817 - __main__ - INFO - Starting scrape of https://bigleagueinc.atlassian.net/l/cp/ru5nUbGr
+2025-03-05 19:22:48,817 - src.crawler - INFO - Detected Confluence URL: https://bigleagueinc.atlassian.net/l/cp/ru5nUbGr. Delegating to RobustCrawler.
+2025-03-05 19:22:48,817 - src.confluence_scraper - WARNING - Confluence API credentials missing. Falling back to HTML crawling.
+2025-03-05 19:22:48,817 - src.confluence_scraper - INFO - Using HTML fallback for https://bigleagueinc.atlassian.net/l/cp/ru5nUbGr
+2025-03-05 19:22:50,517 - src.processor - INFO - Processing crawled content
+2025-03-05 19:22:50,518 - src.processor - INFO - Using standard content
+2025-03-05 19:22:50,518 - src.file_manager - INFO - Content saved to /Users/ajay/Dev/scraper/test_output/bigleagueinc.atlassian.net/unnamed_page_20250305-192250.md
+2025-03-05 19:22:50,518 - __main__ - INFO - Successfully saved markdown to /Users/ajay/Dev/scraper/test_output/bigleagueinc.atlassian.net/unnamed_page_20250305-192250.md

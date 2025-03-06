@@ -1,0 +1,12 @@
+README.md
+setup.py
+src/scrapemd.egg-info/PKG-INFO
+src/scrapemd.egg-info/SOURCES.txt
+src/scrapemd.egg-info/dependency_links.txt
+src/scrapemd.egg-info/entry_points.txt
+src/scrapemd.egg-info/requires.txt
+src/scrapemd.egg-info/top_level.txt
+tests/test_crawler.py
+tests/test_file_manager.py
+tests/test_integration.py
+tests/test_processor.py

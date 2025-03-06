@@ -4,9 +4,8 @@ Content Processor module for the Web Scraper
 This module handles the processing of crawled content and conversion to markdown.
 """
 
-import os
-import re
 import logging
+import re
 from typing import Dict, Any, Optional
 from urllib.parse import urlparse
 
@@ -88,7 +87,7 @@ class ContentProcessor:
                 return soup.title.string.strip()
             
             # Method 2: Check Open Graph meta tags
-            og_title = soup.find('meta', property='og:title')
+            og_title = soup.find('meta', property='og:title') or soup.find('meta', attrs={'property': 'og:title'})
             if og_title and og_title.get('content'):
                 return og_title['content'].strip()
             
@@ -150,6 +149,10 @@ class ContentProcessor:
             try:
                 from bs4 import BeautifulSoup
                 soup = BeautifulSoup(html_content, 'html.parser')
+                
+                # Remove script and style elements
+                for script_or_style in soup(["script", "style"]):
+                    script_or_style.decompose()
                 
                 # Simple HTML to markdown conversion
                 text = soup.get_text(separator='\n\n', strip=True)

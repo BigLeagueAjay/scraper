@@ -1,0 +1,2 @@
+[console_scripts]
+scrapemd = cli:main_cli

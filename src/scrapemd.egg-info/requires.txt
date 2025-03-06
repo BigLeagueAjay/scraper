@@ -1,0 +1,6 @@
+setuptools>=65.0.0
+beautifulsoup4>=4.11.0
+html2text>=2020.1.16
+crawl4ai>=0.5.0
+requests>=2.28.0
+keyring>=23.0.0

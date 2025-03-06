@@ -13,7 +13,7 @@ from typing import Dict, Optional, Tuple
 import requests
 import keyring
 
-from src.error_handler import AuthenticationError
+from error_handler import AuthenticationError
 
 logger = logging.getLogger(__name__)
 

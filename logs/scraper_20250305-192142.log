@@ -1,0 +1,5 @@
+2025-03-05 19:21:42,474 - root - INFO - Logging initialized at level INFO
+2025-03-05 19:21:42,474 - root - INFO - Log file: /Users/ajay/Dev/scraper/logs/scraper_20250305-192142.log
+2025-03-05 19:21:42,475 - __main__ - INFO - Starting scrape of https://example.com
+2025-03-05 19:21:42,475 - src.crawler - INFO - Handling URL with crawl4ai: https://example.com
+2025-03-05 19:21:45,890 - src.error_handler - ERROR - AttributeError: 'CrawlResult' object has no attribute 'content'

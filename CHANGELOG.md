@@ -5,6 +5,23 @@ All notable changes to the Web Scraper with crawl4ai project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-03-05
+
+### Fixed
+- Package structure and import issues for better compatibility
+- Entry point configuration in setup.py
+- Handling of CrawlResult objects from crawl4ai
+- Confluence page ID extraction to support multiple URL formats
+- URL handling in RobustCrawler for more reliable operation
+- Removed incorrect dependency on 'confluence_scraper' (which is a local module)
+
+### Added
+- Better fallback mechanisms for content extraction
+- Enhanced error handling and logging
+- Improved compatibility with different Confluence URL formats
+- Better title extraction from HTML content
+- Updated troubleshooting documentation
+
 ## [0.1.4] - 2025-03-05
 
 ### Added

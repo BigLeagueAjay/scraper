@@ -9,6 +9,7 @@ scrapemd.egg-info/top_level.txt
 src/__init__.py
 src/auth_manager.py
 src/cli.py
+src/confluence_scraper.py
 src/crawler.py
 src/error_handler.py
 src/file_manager.py

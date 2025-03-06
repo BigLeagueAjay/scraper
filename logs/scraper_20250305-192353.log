@@ -1,0 +1,9 @@
+2025-03-05 19:23:53,799 - root - INFO - Logging initialized at level INFO
+2025-03-05 19:23:53,799 - root - INFO - Log file: /Users/ajay/Dev/scraper/logs/scraper_20250305-192353.log
+2025-03-05 19:23:53,800 - cli - INFO - Starting scrape of https://example.com
+2025-03-05 19:23:53,800 - crawler - INFO - Handling URL with crawl4ai: https://example.com
+2025-03-05 19:23:55,698 - crawler - INFO - Using markdown content from crawl4ai
+2025-03-05 19:23:55,773 - processor - INFO - Processing crawled content
+2025-03-05 19:23:55,773 - processor - INFO - Using markdown provided by crawl4ai
+2025-03-05 19:23:55,774 - file_manager - INFO - Content saved to /Users/ajay/Dev/scraper/test_output2/example.com/Example_Domain_20250305-192355.md
+2025-03-05 19:23:55,774 - cli - INFO - Successfully saved markdown to /Users/ajay/Dev/scraper/test_output2/example.com/Example_Domain_20250305-192355.md
